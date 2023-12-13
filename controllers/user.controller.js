@@ -39,7 +39,6 @@ module.exports = {
     try {
       let user = await userModel
         .findById(req.params.id)
-        .populate("major")
         .select(["-updatedAt", "-createdAt"]);
       return res.status(200).json(user);
     } catch (error) {
@@ -107,30 +106,10 @@ module.exports = {
   },
   update: async (req, res) => {
     try {
-      console.log(req.body);
-      const existManagement = await userModel.findOne({
-        role: 2,
-        major: req.body.major,
-      });
-
-      if (
-        existManagement?.username != req.body.username &&
-        req?.body?.role == 2
-      ) {
-        throw new ErrorResponse(
-          404,
-          `${existManagement?.name} hiện đang là trưởng môn của chuyên ngành này`
-        );
-      }
-
       await userModel.findByIdAndUpdate(req.params.id, {
         ...req.body,
       });
-
-      const user = await userModel
-        .findById(req.params.id)
-        .populate("major")
-        .select("-password");
+      const user = await userModel.findById(req.params.id);
       res.status(201).json(user);
     } catch (error) {
       throw error;
